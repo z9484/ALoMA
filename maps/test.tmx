@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="50" height="50" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="dg_edging232" tilewidth="32" tileheight="32">
+  <image source="../gfx/tiles/dg_edging232.gif" width="256" height="544"/>
+ </tileset>
+ <tileset firstgid="137" name="dg_town032" tilewidth="32" tileheight="32">
+  <image source="../gfx/tiles/dg_town032.gif" width="288" height="128"/>
+ </tileset>
+ <tileset firstgid="173" name="dg_features32" tilewidth="32" tileheight="32">
+  <image source="../gfx/tiles/dg_features32.gif" width="288" height="416"/>
+ </tileset>
+ <tileset firstgid="290" name="dg_edging132" tilewidth="32" tileheight="32">
+  <image source="../gfx/tiles/dg_edging132.gif" trans="ffffff" width="256" height="512"/>
+ </tileset>
+ <tileset firstgid="418" name="dg_extended" tilewidth="32" tileheight="32">
+  <image source="../gfx/tiles/dg_extended.bmp" trans="476c6c" width="892" height="64"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJzt1LENwjAUhOFjLbYJooOGMoIFCCOwABuxDk5hJbEekl1xRv8nXZPqnZ5fJAAAADh57urjrJz1ru9x7lP2mNK3R5BJvruJ3s487z5I1OP9o7lLQ8phlaPaeri4aDvbWdt7eCm+D7cuY8o15aSlR+1/y6lHnivvpfceeS831fVwe1fZeqaeO7T26MU/dIi43jcAAAAAAACANh8UyFsw
+  </data>
+ </layer>
+ <layer name="Tile Layer 3" width="50" height="50" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJzt0sEJACAMA8B2ZOdSd9QNfCr1DvJPIBEAAMCPekbMnZG3m1BRK/IrO95iBwAAAAAAJwtMwgRC
+  </data>
+ </layer>
+ <layer name="roof" width="50" height="50" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztzrERgCAQAEHoQ40cI7T/HmyKzyUQkk92Zy6/UgAAgL+2aB90ZE4tOKO3fruyxya16B70ZE4BAAAAAACQpgPD+gZN
+  </data>
+ </layer>
+ <layer name="roof2" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztzzEKgDAQRNHkHmoVrNT738FLZXvTKIQFeQ9+P1MKAADMt0TroC1z1ActuuuzPXvYS3/5cUTnoCtzFAAAAAAAAGk6ERUKkw==
+  </data>
+ </layer>
+</map>

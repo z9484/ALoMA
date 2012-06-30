@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="11" height="8" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name=".dgfeatures" tilewidth="32" tileheight="32">
+  <image source="../gfx/tiles/dg_features32.gif" width="288" height="416"/>
+ </tileset>
+ <tileset firstgid="118" name="obstacles" tilewidth="32" tileheight="32">
+  <image source="../gfx/redsquare.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="119" name="redsquare" tilewidth="32" tileheight="32">
+  <image source="../gfx/redsquare.png" width="32" height="32"/>
+ </tileset>
+ <layer name="1" width="11" height="8">
+  <data encoding="base64" compression="zlib">
+   eJzTZmBg0CYB6wGxBpTWw8FHVosPa2BRi24WOeaiq8VmpgaF5hKLAZxqD0c=
+  </data>
+ </layer>
+ <layer name="obstacles" width="11" height="8" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJwrZ2BgKCcBMyDRDHj46GLYALq52Mwix1x0tdj0oNtJqrnEYgBDfxKZ
+  </data>
+ </layer>
+ <objectgroup name="events" width="11" height="8">
+  <object name="1" type="trap" x="128" y="64" width="32" height="32"/>
+  <object name="2" type="warp" x="288" y="32" width="32" height="32">
+   <properties>
+    <property name="destX" value="1"/>
+    <property name="destY" value="6"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
