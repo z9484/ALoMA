@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="50" height="50" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="dg_features32" tilewidth="32" tileheight="32">
+  <image source="../gfx/tiles/dg_features32.gif" trans="ffffff" width="288" height="416"/>
+ </tileset>
+ <tileset firstgid="118" name="dg_extended" tilewidth="32" tileheight="32">
+  <image source="../gfx/tiles/dg_extended.bmp" trans="476c6c" width="892" height="64"/>
+ </tileset>
+ <tileset firstgid="172" name="redsquare" tilewidth="32" tileheight="32">
+  <image source="../gfx/redsquare.png" trans="ffffff" width="32" height="32"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJzt2lEKwjAQhOG5ijf7738KDVisdYltBLMT9oN568MOazAWpbVwiCseuT3D1El+g9577OMEvXrsw7yRhqB1ehzj2GMP+e5jg+Iz7wb5n5EGVY9M0Brno0Heu9gg/100yH8XDaoemaD1emxxhPy/BxtUPTIhSCmllFKuIcjIM7Ohz/tNlOx3IBS/++6FCXN+g8b2wR9nPIMgvWcy7+QstMbvabTOPrKej7NQfaYyQdVjNoI4vvtDfveTCKoemaD+f0GYM9YQOrnqDu4YRRM=
+  </data>
+ </layer>
+ <layer name="Tile Layer 2" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJzt2UENACAMBMG6Bx81igGeJNeQGQX73yqm2ukAAAAA4GqlAwAAHvEiZul0AAAAfOAAm9sCOw==
+  </data>
+ </layer>
+ <layer name="obstacles" width="50" height="50" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztmlEKwCAMQ73/WTzk6J8Uq5vg2oQ8GAxh0IdmumlrXHR3odKDezS8B2rfRPXKIwc/lvrQjgpD5n22EbNuzGqWRx5MHgz5MBjeV8Y4d7B4ICOPWjB6IGfd1y2PXJg8kL/RhRBCiAq8mU8R5tzZ+mZXN4LHrWduc9of1Vy+5mNsQ0V7FbVg+PenMVULeeSz2h9GyvquTnn8C5PH6iwIiocRrX9PHB5/5WFt
+  </data>
+ </layer>
+ <objectgroup name="events" width="50" height="50">
+  <object name="mon1" type="monster" x="160" y="320" width="32" height="32">
+   <properties>
+    <property name="monType" value="slime"/>
+   </properties>
+  </object>
+  <object name="mon2" type="monster" x="224" y="288" width="32" height="32">
+   <properties>
+    <property name="monType" value="slime"/>
+   </properties>
+  </object>
+  <object name="mon3" type="monster" x="256" y="352" width="32" height="32">
+   <properties>
+    <property name="monType" value="slime"/>
+   </properties>
+  </object>
+  <object name="1" type="warp" x="96" y="64" width="32" height="32">
+   <properties>
+    <property name="destX" value="8"/>
+    <property name="destY" value="1"/>
+    <property name="map" value="battle"/>
+   </properties>
+  </object>
+  <object name="2" type="warp" x="256" y="704" width="32" height="32">
+   <properties>
+    <property name="destX" value="24"/>
+    <property name="destY" value="34"/>
+    <property name="map" value=""/>
+   </properties>
+  </object>
+  <object name="3" type="warp" x="768" y="1056" width="32" height="32">
+   <properties>
+    <property name="destX" value="8"/>
+    <property name="destY" value="21"/>
+    <property name="map" value=""/>
+   </properties>
+  </object>
+  <object name="4" type="trap" x="960" y="1088" width="32" height="32"/>
+  <object name="mon4" type="monster" x="192" y="672" width="32" height="32">
+   <properties>
+    <property name="monType" value="thief"/>
+   </properties>
+  </object>
+  <object name="mon5" type="monster" x="256" y="640" width="32" height="32">
+   <properties>
+    <property name="monType" value="thief"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

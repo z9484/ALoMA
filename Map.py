@@ -1,5 +1,7 @@
 import os
+import constants
 from pytmx import tmxloader
+from player import *
 
 class Map(object):
     def __init__(self, filename):
@@ -7,11 +9,16 @@ class Map(object):
         print 'loading', filename
         self.tiled = tmxloader.load_pygame('maps/' + filename + '.tmx') 
         #print dir(self.tiled)
-        #obj = self.tiled.getObjects()
-        #o = obj.next()
-        #o2 = obj.next()
-        #print o2.type
+        self.events = [[0 for i in range(self.tiled.width)] for j in range(self.tiled.height)]
+        self.monsters = []
         
+        for obj in self.tiled.getObjects():
+            obj.x /= constants.TILESIZE
+            obj.y /= constants.TILESIZE
+            self.events[obj.y][obj.x] = obj
+            if obj.type == 'monster':
+                 self.monsters.append(Monster(obj.monType, obj.x, obj.y))
+                
         if os.path.exists(os.path.abspath(os.curdir + '/maps/'  + filename + '.py')):
             exec('from maps.{0} import {0} as mapObject'.format(filename))
             self.mapScript = mapObject()

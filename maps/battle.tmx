@@ -9,9 +9,17 @@
  <tileset firstgid="119" name="redsquare" tilewidth="32" tileheight="32">
   <image source="../gfx/redsquare.png" width="32" height="32"/>
  </tileset>
+ <tileset firstgid="120" name="dg_extended" tilewidth="32" tileheight="32">
+  <image source="../gfx/tiles/dg_extended.bmp" trans="476c6c" width="892" height="64"/>
+ </tileset>
  <layer name="1" width="11" height="8">
   <data encoding="base64" compression="zlib">
    eJzTZmBg0CYB6wGxBpTWw8FHVosPa2BRi24WOeaiq8VmpgaF5hKLAZxqD0c=
+  </data>
+ </layer>
+ <layer name="Tile Layer 3" width="11" height="8">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAu6KSyeUMdAACS8ACK
   </data>
  </layer>
  <layer name="obstacles" width="11" height="8" visible="0">
@@ -23,8 +31,19 @@
   <object name="1" type="trap" x="128" y="64" width="32" height="32"/>
   <object name="2" type="warp" x="288" y="32" width="32" height="32">
    <properties>
-    <property name="destX" value="1"/>
-    <property name="destY" value="6"/>
+    <property name="destX" value="3"/>
+    <property name="destY" value="3"/>
+    <property name="map" value="dungeon01"/>
+   </properties>
+  </object>
+  <object name="mon1" type="monster" x="128" y="128" width="32" height="32">
+   <properties>
+    <property name="monType" value="rat"/>
+   </properties>
+  </object>
+  <object name="mon2" type="monster" x="192" y="128" width="32" height="32">
+   <properties>
+    <property name="monType" value="Snake"/>
    </properties>
   </object>
  </objectgroup>

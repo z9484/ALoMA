@@ -35,16 +35,14 @@ class GameState(State):
         self.textBox = pygame.Surface((236, 36))
         '''
         self.sideBar = pygame.Surface((160, 480))
-        self.sideBar.fill((135, 206, 250))
-
-        self.npcs = [NPC("Rat", 0, self.content['monsters'][1], 4, 4), NPC("Rat", 0, self.content['monsters'][0], 6, 4)]
+        self.sideBar.fill((135, 206, 250))        
         
         self.cheat = 0
 
     def isNpcBlocking(self, x, y):
         isBlocked = False
-        for i in range(len(self.npcs)):
-            if self.npcs[i].posX == x and self.npcs[i].posY == y:
+        for i in range(len(self.map1.monsters)):
+            if self.map1.monsters[i].posX == x and self.map1.monsters[i].posY == y:
                 isBlocked = True
                 break
                 
@@ -54,9 +52,10 @@ class GameState(State):
         self.screen.fill(BLACK)
         for y in xrange(15):
             for x in xrange(15):
-                for i in range(1):
+                for i in range(2):
                     try:        
                         if isinstance(self.view[y][x][i], pygame.Surface):
+                            self.view[y][x][i].set_colorkey(constants.COLORKEY)
                             self.screen.blit(self.view[y][x][i], (x*TILESIZE, y*TILESIZE) )
                             
                     except:
@@ -64,8 +63,8 @@ class GameState(State):
 
         self.player1.draw(self.screen)
         
-        for i in range(len(self.npcs)):
-            self.npcs[i].draw(self.screen, self.player1.posX, self.player1.posY)
+        for i in range(len(self.map1.monsters)):
+            self.map1.monsters[i].draw(self.screen, self.player1.posX, self.player1.posY)
         
         #self.screen.blit(self.content['moveTile'], (7*TILESIZE, 6*TILESIZE) )
         """
@@ -110,28 +109,28 @@ class GameState(State):
         if self.cheat:
             self.player1.moveLeft()
         else:
-            if not isinstance(self.view[7][6][1], pygame.Surface) and not self.isNpcBlocking(self.player1.posX - 1, self.player1.posY):
+            if not isinstance(self.view[7][6][2], pygame.Surface) and not self.isNpcBlocking(self.player1.posX - 1, self.player1.posY):
                 self.player1.moveLeft()
 
     def player_right(self):
         if self.cheat:
             self.player1.moveRight()
         else:
-            if not isinstance(self.view[7][8][1], pygame.Surface) and not self.isNpcBlocking(self.player1.posX + 1, self.player1.posY):
+            if not isinstance(self.view[7][8][2], pygame.Surface) and not self.isNpcBlocking(self.player1.posX + 1, self.player1.posY):
                 self.player1.moveRight()
         
     def player_up(self):
         if self.cheat:
             self.player1.moveUp()
         else:
-            if not isinstance(self.view[6][7][1], pygame.Surface) and not self.isNpcBlocking(self.player1.posX, self.player1.posY - 1):
+            if not isinstance(self.view[6][7][2], pygame.Surface) and not self.isNpcBlocking(self.player1.posX, self.player1.posY - 1):
                 self.player1.moveUp()
         
     def player_down(self):
         if self.cheat:
             self.player1.moveDown()
         else:
-            if not isinstance(self.view[8][7][1], pygame.Surface) and not self.isNpcBlocking(self.player1.posX, self.player1.posY + 1):
+            if not isinstance(self.view[8][7][2], pygame.Surface) and not self.isNpcBlocking(self.player1.posX, self.player1.posY + 1):
             #if not isinstance(self.view[8][7][7], pygame.Surface) and not isinstance(self.view[8][7][8], pygame.Surface):
                 self.player1.moveDown()
         
@@ -153,12 +152,19 @@ class GameState(State):
             #if self.map1.events[(self.player1.posX, self.player1.posY)][0] == 0:
                 #self.changemap(self.map1.events[(self.player1.posX, self.player1.posY)][2], self.map1.events[(self.player1.posX, self.player1.posY)][1])
 
+        #Check for events
+        if self.map1.events[self.player1.posY][self.player1.posX] != 0:
+            event = self.map1.events[self.player1.posY][self.player1.posX]
+            if event.type == 'warp':
+                self.changemap(event.map, (int(event.destX), int(event.destY)))
 
     def changemap(self, newMap, position):
+        #if self.player1.
         self.player1.posX = position[0]
         self.player1.posY = position[1]
-        self.player1.map = newMap
-        self.map1 = Map(newMap)
+        if newMap != '':
+            self.player1.map = newMap
+            self.map1 = Map(newMap)
         self.move('Nowhere')
         
     def letter(self, key):
@@ -247,28 +253,33 @@ class GameState(State):
         
         if self.targetMode:
             if key == K_LEFT: 
-                self.npcs[self.currentTarget].isTargeted = False
+                self.map1.monsters[self.currentTarget].isTargeted = False
                 self.currentTarget -= 1
                 if self.currentTarget == -1:
-                    self.currentTarget = len(self.npcs) - 1
+                    self.currentTarget = len(self.map1.monsters) - 1
                     
-                self.npcs[self.currentTarget].isTargeted = True
+                self.map1.monsters[self.currentTarget].isTargeted = True
                                 
             elif key == K_RIGHT:
-                self.npcs[self.currentTarget].isTargeted = False
+                self.map1.monsters[self.currentTarget].isTargeted = False
                 self.currentTarget += 1
-                if self.currentTarget == len(self.npcs):
+                if self.currentTarget == len(self.map1.monsters):
                     self.currentTarget = 0
                     
-                self.npcs[self.currentTarget].isTargeted = True
+                self.map1.monsters[self.currentTarget].isTargeted = True
                 
             elif key == K_LCTRL:
                 self.targetMode = False
-                self.npcs[self.currentTarget].isTargeted = False
-                dmg, dCrit = self.player1.attack(self.npcs[self.currentTarget], self.player1.isMelee)
+                self.map1.monsters[self.currentTarget].isTargeted = False
+                dmg, dCrit = self.player1.attack(self.map1.monsters[self.currentTarget], self.player1.isMelee)
                 if dmg == -1:
                     print 'Missed'
-
+                
+                if self.map1.monsters[self.currentTarget].hp == 0:
+                    print 'Monster defeated!'
+                    self.map1.monsters.remove(self.map1.monsters[self.currentTarget])
+                    
+            #Switch from monsters to players or npcs?
             #elif key == K_UP: self.move("up")
             #elif key == K_DOWN: self.move("down")
         else:
@@ -279,7 +290,7 @@ class GameState(State):
             #elif key == K_g: self.cmd_g()
             elif key == K_TAB:
                 self.targetMode = True
-                self.npcs[self.currentTarget].isTargeted = True
+                self.map1.monsters[self.currentTarget].isTargeted = True
                 
         
         if self.chatMode:
@@ -311,7 +322,7 @@ class GameState(State):
                 else:
                     #try:
                         #row.append(self.map[y+q][x+r])
-                    layers = [self.map1.tiled.getTileImage(x+r, y+q, i) for i in range(2)]
+                    layers = [self.map1.tiled.getTileImage(x+r, y+q, i) for i in range(3)]
                     row.append(layers)
                         
                     #except:

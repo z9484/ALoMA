@@ -30,7 +30,7 @@ class Character(object):
         self.inBattle = True
         self.isTargeted = False
     
-        self.melee = constants.BLADES['claws']
+        self.melee = []
         self.ranged = []
         
         self.items = [] 
@@ -101,7 +101,7 @@ class Character(object):
         self.modMAG = self.getMod(self.MAG)
         
     def getMod(self, skill):
-        return (skill - 10) / 2
+        return (skill - 8) / 2
     
     def takeDamage(self, dmg):
         self.hp -= dmg
@@ -109,7 +109,7 @@ class Character(object):
         
     def attack(self, defender, isMelee):
 
-        aSkill, aCrit = constants.rollDice(1,self.skill,0,-1)
+        aSkill, aCrit = constants.rollDice(1,self.skill,self.modSkill,-1)
         #Return on critical failure
         if aCrit == -1: 
             return  -1, -1
@@ -230,10 +230,30 @@ class Player(Character):
                 temp.set_colorkey(constants.COLORKEY)
                 self.image.blit(temp, (0,0))
         
-class NPC(Character):
-    def __init__(self, name, gender, image, x, y):
-        super(NPC, self).__init__(name, gender, 'Monster', image, x, y, 8, 1, 1, 4, 1)
+class Monster(Character):
+    def __init__(self, name, x, y):
+    
+        #print dir(constants.MONSTERS)
+        if name in constants.MONSTERS:
+            #MONSTERS['rat'] = ('gfx/monsters/animals/gray_rat.bmp', None, BLADES['claws'], 8, (1, 1, 4, 0))
+            monStats = constants.MONSTERS[name]
+            image = pygame.image.load(monStats[0])
+            skill = monStats[3]
+            stats = monStats[4]
+            
+        else:
+            print 'No', name, 'monster exists defaulting to rat'
+            monStats = constants.MONSTERS['rat']
+            image = pygame.image.load(monStats[0])
+            skill = monStats[3]
+            stats = monStats[4]
+            
+        image.set_colorkey(constants.COLORKEY)
+        super(Monster, self).__init__(name, 1, 'Monster', image, x, y, skill, *stats)
         self.load(image)
+        
+        self.ranged = monStats[1]
+        self.melee = monStats[2]
         self.printStats()
         
     def draw(self, screen, x, y):

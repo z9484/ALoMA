@@ -65,7 +65,7 @@ SPELLS['flame'] = weapon('flame', 'effect/bolt04.bmp', 100, [1,6,-1,1], 'MAG', 0
 
 
 MONSTERS = {}
-MONSTERS['gray_rat'] = 'gfx/monsters/animals/gray_rat.bmp'
+MONSTERS['rat'] = ('gfx/monsters/animals/gray_rat.bmp', None, BLADES['claws'], 8, (1, 1, 4, 0))
 MONSTERS['black_snake'] = 'gfx/monsters/animals/black_snake.bmp'
 
 targetCursor = pygame.image.load('gfx/cursor_red.png')
