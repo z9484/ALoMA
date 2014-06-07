@@ -9,6 +9,8 @@ class Battler(object):
         self.isPlayer = isPlayer
         self.isMyTurn = False
         self.isTargeted = False
+        self.is_defending = False
+        self.previous_command = 0
         self.anim_state = ''
         self.events = {}  # Current animation events currently affecting the battler
 
@@ -38,7 +40,7 @@ class Battler(object):
             self.spdBarBack.fill((0, 0, 255))
 
         self.commandText = ['Attack', 'Defend', 'Item', 'Run']
-        if 'Magus' in self.character.feats or 'Mage' in self.character.feats:
+        if 'Mystic' in self.character.feats or 'Mage' in self.character.feats:
             self.commandText.insert(1, 'Magic')
 
         if 'Summoner' in self.character.feats:
@@ -46,8 +48,8 @@ class Battler(object):
 
         self.commands = [content["font1"].render(text, True, constants.WHITE) for text in self.commandText]
 
-    def attack(self, target, content):
-        dmg, dCrit = self.character.attack(target.character)
+    def attack(self, target, content, no_front_row):
+        dmg, dCrit = self.character.attack(target.character, no_front_row)
         dmgString = str(abs(dmg))
         if dmg == -1:
             print 'Missed'
@@ -62,6 +64,16 @@ class Battler(object):
         self.character.animcount = self.character.ANIM_BATTLE_TIME
 
         return dmg, dCrit
+
+    def defend(self):
+        self.is_defending = True
+        self.didAction(0.75)
+
+    def takeDamage(self, dmg):
+        if self.is_defending:
+            dmg /= 2
+
+        self.character.takeDamage(dmg)
 
     def __getMaxWait(self):
         if self.isPlayer:
@@ -82,9 +94,10 @@ class Battler(object):
 
             if self.character.animcount == 0:
                 if self.anim_state in self.events:
-                    event = constants.pygame.event.Event(constants.USEREVENT_EVENT_TO_ADD, payload=self.events[self.anim_state])
-                    constants.pygame.event.post(event)
-                    del self.events[self.anim_state]
+                    if self.character.hp > 0:  # If still alive actually fire the event
+                        event = constants.pygame.event.Event(constants.USEREVENT_EVENT_TO_ADD, payload=self.events[self.anim_state])
+                        constants.pygame.event.post(event)
+                        del self.events[self.anim_state]
 
                 self.anim_state = ''
                 self.character.frame = 0

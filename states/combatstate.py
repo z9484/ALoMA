@@ -205,17 +205,29 @@ class CombatState(State):
                 if char.active and self.currentPlayer == -1:
                     self.currentPlayer = self.rhsPlayers.index(char)
                     char.isMyTurn = True
+                    char.is_defending = False
+                    self.current = char.previous_command
 
             # Update enemies
             for char in self.lhsPlayers:
                 char.update()
                 if char.active:
-                    choices = [player for player in self.rhsPlayers if player.character.hp > 0]
+                    char.is_defending = False
+                    choices = []
+
+                    no_front_row = True
+                    for player in self.rhsPlayers:
+                        if not player.character.isBackRow:
+                            no_front_row = False
+
+                        if player.character.hp > 0:
+                            choices.append(player)
+
                     target = random.choice(choices)
                     print target.character.name
 
                     # target = self.rhsPlayers[0]
-                    dmg, dCrit = char.attack(target, self.content)
+                    dmg, dCrit = char.attack(target, self.content, no_front_row)
                     char.events['attacking'].loadFunc(self.doDamage, dmg, target)
                     # dmgString = str(abs(dmg))
                     # if dmg == 0:
@@ -342,7 +354,7 @@ class CombatState(State):
 
     def doDamage(self, dmg, target):
         if target is not None:
-            target.character.takeDamage(dmg)
+            target.takeDamage(dmg)
             if target.character.hp <= 0:
                 print target.character.name, 'defeated!'
                 if not target.isPlayer:
@@ -371,15 +383,27 @@ class CombatState(State):
     def doAction(self):
         if self.mode == 0 and self.currentPlayer != -1:
             if not self.currentAction:
-                if self.current == 0:  # Attack
+                self.rhsPlayers[self.currentPlayer].previous_command = self.current
+                if self.rhsPlayers[self.currentPlayer].commandText[self.current] == 'Attack':
                     self.mode = 1
                     self.currentAction = 'attack'
                     self.lhsPlayers[self.current].isTargeted = True
 
+                elif self.rhsPlayers[self.currentPlayer].commandText[self.current] == 'Defend':
+                    self.rhsPlayers[self.currentPlayer].defend()
+                    self.currentPlayer = -1
+                    # self.currentAction = 'defend'
+
         elif self.mode == 1:
             if self.currentAction == 'attack':
                 target = self.lhsPlayers[self.current]
-                dmg, dCrit = self.rhsPlayers[self.currentPlayer].attack(target, self.content)
+
+                no_front_row = True
+                for player in self.lhsPlayers:
+                    if not player.character.isBackRow:
+                        no_front_row = False
+
+                dmg, dCrit = self.rhsPlayers[self.currentPlayer].attack(target, self.content, no_front_row)
                 self.rhsPlayers[self.currentPlayer].events['attacking'].loadFunc(self.doDamage, dmg, target)
                 # self.animEvents.append(event)
                 self.currentPlayer = -1

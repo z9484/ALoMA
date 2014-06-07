@@ -58,8 +58,7 @@ class Character(object):
         # self.inBattle = True
         # self.isTargeted = False
     
-        self.melee = []
-        self.ranged = []
+        self.weapon = constants.WEAPONS['fists']
         
         self.armor = 0
         self.naturalArmor = naturalArmor
@@ -130,19 +129,19 @@ class Character(object):
         self.hp -= dmg
         if self.hp < 0: self.hp = 0
         
-    def canAttackPos(self, x, y):
-        #if self.ranged:
-        if self.melee:
-            if self.posX == x+1 and self.posY == y:
-                return True
-            elif self.posX == x-1 and self.posY == y:
-                return True
-            elif self.posX == x and self.posY == y+1:
-                return True
-            elif self.posX == x and self.posY == y-1:
-                return True
+    # def canAttackPos(self, x, y):
+    #     #if self.ranged:
+    #     if self.melee:
+    #         if self.posX == x+1 and self.posY == y:
+    #             return True
+    #         elif self.posX == x-1 and self.posY == y:
+    #             return True
+    #         elif self.posX == x and self.posY == y+1:
+    #             return True
+    #         elif self.posX == x and self.posY == y-1:
+    #             return True
                 
-    def attack(self, defender):
+    def attack(self, defender, no_front_row):
         aSkill, aCrit = constants.rollDice(1, self.skill, self.modSkill, -1)
         #Return on critical failure
         if aCrit == -1:
@@ -158,20 +157,24 @@ class Character(object):
         
         if aSkill > dSkill:
             # if isMelee:
-            weapon = self.melee
             # else:
             #     weapon = self.ranged
             
-            die, sides, mod, crits = weapon.damage
+            die, sides, mod, crits = self.weapon.damage
             
-            if weapon.type == 'STR':
+            if self.weapon.type == 'STR':
                 mod += self.modSTR
-            elif weapon.type == 'AGI': 
+            elif self.weapon.type == 'AGI':
                 mod += self.modAGI
-            elif weapon.type == 'MAG': 
+            elif self.weapon.type == 'MAG':
                 mod += self.modMAG
 
-            return constants.rollDice(die, sides, mod, crits)
+            dmg, dcrit = constants.rollDice(die, sides, mod, crits)
+
+            if not no_front_row and defender.isBackRow and self.weapon.range == 1:
+                dmg /= 2
+
+            return dmg, dcrit
             
         else:
             return 0, -1
@@ -184,15 +187,17 @@ class Player(Character):
         race1 = constants.RACES[race]
         super(Player, self).__init__(name, gender, race, image, 5, 6, 20, race1.naturalArmor, race1.STR, race1.AGI, race1.VIT, race1.MAG)
         self.gold = 20
-            
-        self.melee = constants.BLADES['short sword']
-        self.ranged = constants.RANGED['short bow']
+
+        self.weapon = constants.WEAPONS['short bow']
+        # self.weapon = constants.WEAPONS['short sword']
+        self.offhand = None
+
         self.isMelee = False
         
         self.hair = 'boromir.bmp'
-        self.beard = []
-        self.equipCloak = []
-        self.equipHead = []
+        self.beard = ''
+        self.equipCloak = ''
+        self.equipHead = ''
         self.equipBody = 'leather_jacket.bmp'
         self.equipLegs = 'leg/pants_darkgreen.bmp'
         self.equipFeet = 'short_brown2.bmp'
@@ -270,13 +275,13 @@ class Player(Character):
             image.blit(temp, (0,0))
         
         if self.isMelee:
-            if self.melee:
-                temp = pygame.image.load('gfx/player/' + self.melee.imgName)
+            if self.weapon.range == 1:
+                temp = pygame.image.load('gfx/player/' + self.weapon.imgName)
                 temp.set_colorkey(constants.COLORKEY)
                 image.blit(temp, (0,0))
         else:
-            if self.ranged:
-                temp = pygame.image.load('gfx/player/' + self.ranged.imgName)
+           if self.weapon.range > 1:
+                temp = pygame.image.load('gfx/player/' + self.weapon.imgName)
                 temp.set_colorkey(constants.COLORKEY)
                 image.blit(temp, (0,0))
 

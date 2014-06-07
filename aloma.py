@@ -22,9 +22,8 @@ class Game(object):
             pygame.image.load('gfx/monsters/animals/gray_rat.bmp')]
         
         for i in xrange(len(self.tiles["monsters"])):
-            self.tiles["monsters"][i].set_colorkey((71,108,108))
-            
-            
+            self.tiles["monsters"][i].set_colorkey((71, 108, 108))
+
         chars = pygame.image.load('gfx/Joram_bow.png')
         
         self.tiles["targetCursor"] = pygame.image.load('gfx/cursor_red.png')
@@ -53,11 +52,6 @@ class Game(object):
         self.currentState = 0
         self.gamestate = []
         self.gamestate.append(GameState(self.screen, self.tiles, party, self.gamestate))
-        #CombatState(self.screen, self.tiles, player1,self.gamestate )]
-        
-        #self.gamestate = GameState(self.screen, self.tiles, player1)
-        #self.gamestate = CombatState(self.screen, self.tiles)
-
 
     def update(self):
         # USER INPUT

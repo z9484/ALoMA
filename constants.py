@@ -5,7 +5,7 @@ import pygame
 USEREVENT_EVENT_TO_ADD = 25
 
 
-class item(object):
+class Item(object):
     def __init__(self, name, imgName, value, dmg):
         self.name = name
         self.imgName = imgName
@@ -13,12 +13,13 @@ class item(object):
         self.damage = dmg
 
 
-class weapon(item):
-    def __init__(self, name, imgName, value, dmg, wType, hand):
+class Weapon(Item):
+    def __init__(self, name, imgName, value, dmg, wType, cat, hand, range=1):
         self.type = wType
         self.hand = hand
-        self.range = 1
-        super(weapon, self).__init__(name, imgName, value, dmg)
+        self.range = range
+        self.cat = cat
+        super(Weapon, self).__init__(name, imgName, value, dmg)
 
 
 def rollDice(die, sides, mod, crits):
@@ -58,55 +59,49 @@ RACES = {
 }
 
 #weapons
-BLADES = {
-    'short sword': weapon('short sword', 'handR/short_sword_slant.bmp', 5, [1,6,-1,1], 'STR', 0),
-    'claws': weapon('claws', '', 0, [1, 6, -1, 1], 'STR', 1),
-    'dagger': weapon('dagger', '', 0, [1, 4, 0, 3], 'STR', 0),
-    'sword': weapon('sword', '', 0, [1, 6, 0, 2], 'STR', 2),
-    'axe': weapon('axe', '', 0, [1, 8, 0, 2], 'STR', 2),
-    'rapier': weapon('rapier', '', 0, [1, 6, 0, 2], 'STR', 2),
-    'broadsword': weapon('broadsword', '', 0, [1, 8, 0, 3], 'STR', 1),
-    'katana': weapon('katana', '', 0, [1, 10, 0, 3], 'STR', 2),
-    'magic claws': weapon('magic claws', '', 0, [1, 10, 0, 3], 'STR', 1),
-    'great sword': weapon('great sword', '', 0, [1, 12, 0, 3], 'STR', 1),
-    'battleaxe': weapon('battleaxe', '', 0, [2, 10, 0, -1], 'STR', 1),
-    'ulsaera': weapon('ulsaera', '', 0, [2, 6, 0, -1], 'STR', 1),
-}
+WEAPONS = {
+    'short sword': Weapon('short sword', 'handR/short_sword_slant.bmp', 5, [1,6,-1,1], 'STR', 'BLADE', 0),
+    'claws': Weapon('claws', '', 0, [1, 6, -1, 1], 'STR', 'BLADE', 1),
+    'dagger': Weapon('dagger', '', 0, [1, 4, 0, 3], 'STR', 'BLADE', 0),
+    'sword': Weapon('sword', '', 0, [1, 6, 0, 2], 'STR', 'BLADE', 2),
+    'axe': Weapon('axe', '', 0, [1, 8, 0, 2], 'STR', 'BLADE', 2),
+    'rapier': Weapon('rapier', '', 0, [1, 6, 0, 2], 'STR', 'BLADE', 2),
+    'broadsword': Weapon('broadsword', '', 0, [1, 8, 0, 3], 'STR', 'BLADE', 1),
+    'katana': Weapon('katana', '', 0, [1, 10, 0, 3], 'STR', 'BLADE', 2),
+    'magic claws': Weapon('magic claws', '', 0, [1, 10, 0, 3], 'STR', 'BLADE', 1),
+    'great sword': Weapon('great sword', '', 0, [1, 12, 0, 3], 'STR', 'BLADE', 1),
+    'battleaxe': Weapon('battleaxe', '', 0, [2, 10, 0, -1], 'STR', 'BLADE', 1),
+    'ulsaera': Weapon('ulsaera', '', 0, [2, 6, 0, -1], 'STR', 'BLADE', 1),
 
-IMPACT = {
-    'fists': weapon('fists', '', 0, [1, 4, -1, 0], 'STR', 1),
-    'staff': weapon('staff', '', 0, [1, 6, 0, 1], 'STR', 0),
-    'club': weapon('club', '', 0, [1, 6, 0, 1], 'STR', 0),
-    'mace': weapon('mace', '', 0, [1, 8, 0, 1], 'STR', 0),
-    'morning star': weapon('morning star', '', 0, [1, 8, 0, 2], 'STR', 0),
-    'war hammer': weapon('war hammer', '', 0, [1, 12, 0, 3], 'STR', 1),
-}
+    'fists': Weapon('fists', '', 0, [1, 4, -1, 0], 'STR', 'IMPACT', 1),
+    'staff': Weapon('staff', '', 0, [1, 6, 0, 1], 'STR', 'IMPACT', 0),
+    'club': Weapon('club', '', 0, [1, 6, 0, 1], 'STR', 'IMPACT', 0),
+    'mace': Weapon('mace', '', 0, [1, 8, 0, 1], 'STR', 'IMPACT', 0),
+    'morning star': Weapon('morning star', '', 0, [1, 8, 0, 2], 'STR', 'IMPACT', 0),
+    'war hammer': Weapon('war hammer', '', 0, [1, 12, 0, 3], 'STR', 'IMPACT', 1),
 
-PIERCE = {
-    'half spear': weapon('half spear', '', 0, [1, 8, 0, 2], 'AGI', 1),
-    'spear': weapon('spear', '', 0, [1, 10, 0, -1], 'AGI', 1),
-    'halberd': weapon('halberd', '', 0, [1, 12, 0, -1], 'AGI', 1),
-    'naginata': weapon('naginata', '', 0, [1, 12, 0, -1], 'AGI', 1),
-}
+    'half spear': Weapon('half spear', '', 0, [1, 8, 0, 2], 'AGI', 'PIERCE', 1),
+    'spear': Weapon('spear', '', 0, [1, 10, 0, -1], 'AGI', 'PIERCE', 1),
+    'halberd': Weapon('halberd', '', 0, [1, 12, 0, -1], 'AGI', 'PIERCE', 1, range=2),
+    'naginata': Weapon('naginata', '', 0, [1, 12, 0, -1], 'AGI', 'PIERCE', 1, range=2),
 
-RANGED = {
-    'throwing knife': weapon('throwing knife', '', 5, [1, 4, 0, -1], 'AGI', 0),
-    'sling': weapon('sling', '', 5, [1, 4, 0, 1], 'AGI', 0),
-    'throwing stars': weapon('throwing stars', '', 5, [1, 10, 0, -1], 'AGI', 0),
-    'short bow': weapon('short bow', 'handR/bow2.bmp', 5, [1, 6, 0, 1], 'AGI', 0),
-    'bow': weapon('bow', '', 5, [1, 6, 0, 2], 'AGI', 0),
-    'crossbow': weapon('crossbow', '', 5, [1, 6, 0, 2], 'AGI', 0),
-    'heavy crossbow': weapon('heavy crossbow', '', 5, [1, 8, 0, -1], 'AGI', 0),
-    'long bow': weapon('long bow', '', 5, [1, 8, 0, -1], 'AGI', 0),
+    'throwing knife': Weapon('throwing knife', '', 5, [1, 4, 0, -1], 'AGI', 'PIERCE', 0, range=2),
+    'sling': Weapon('sling', '', 5, [1, 4, 0, 1], 'AGI', 'IMPACT', 0, range=2),
+    'throwing stars': Weapon('throwing stars', '', 5, [1, 10, 0, -1], 'AGI', 'PIERCE', 0, range=2),
+    'short bow': Weapon('short bow', 'handR/bow2.bmp', 5, [1, 6, 0, 1], 'AGI', 'PIERCE', 0, range=2),
+    'bow': Weapon('bow', '', 5, [1, 6, 0, 2], 'AGI', 'PIERCE', 0, range=2),
+    'crossbow': Weapon('crossbow', '', 5, [1, 6, 0, 2], 'AGI', 'PIERCE', 0, range=2),
+    'heavy crossbow': Weapon('heavy crossbow', '', 5, [1, 8, 0, -1], 'AGI', 'PIERCE', 0, range=2),
+    'long bow': Weapon('long bow', '', 5, [1, 8, 0, -1], 'AGI', 'PIERCE', 0, range=2),
 }
 
 #spells
 SPELLS = {
-    'flame': weapon('flame', 'effect/bolt04.bmp', 100, [1,6,-1,1], 'MAG', 0),
+    'flame': Weapon('flame', 'effect/bolt04.bmp', 100, [1,6,-1,1], 'MAG', 'FIRE', 0),
 }
 
 MONSTERS = {
-    'rat': ('gfx/monsters/animals/gray_rat.bmp', None, BLADES['claws'], 20, (14, 10, 4, 0)),
+    'rat': ('gfx/monsters/animals/gray_rat.bmp', None, WEAPONS['claws'], 20, (14, 10, 4, 0)),
     'black_snake': 'gfx/monsters/animals/black_snake.bmp'
 }
 
