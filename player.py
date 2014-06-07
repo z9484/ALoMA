@@ -4,20 +4,44 @@ import sys
 from math import sqrt
 import pygame
 
+
+class Party(object):
+    MAX_PARTY_SIZE = 4
+
+    def __init__(self):
+        self.members = []
+        self.gold = 0
+
+    def add(self, character):
+        if len(self.members) < Party.MAX_PARTY_SIZE:
+            availableSlots = range(Party.MAX_PARTY_SIZE)
+            for member in self.members:
+                if member.partyPosition in availableSlots:
+                    availableSlots.remove(member.partyPosition)
+
+            if len(availableSlots) > 0:
+                character.partyPosition = availableSlots[0]
+                self.members.append(character)
+
+    def remove(self, character):
+        self.members.remove(character)
+
+
 class Character(object):
-    def __init__(self, name, gender, race, image, x, y, skill, ste, agi, vit, mag):
+    def __init__(self, name, gender, race, image, x, y, skill, naturalArmor, ste, agi, vit, mag):
         self.name = name
         self.gender = gender
         self.race = race
-    
+        self.isBackRow = False
+        self.partyPosition = 0
         self.skill = skill
         self.STR = ste
         self.AGI = agi
         self.VIT = vit
         self.MAG = mag
-
+        #Add bonus values from equipment and buffs
+        
         self.calcMods()
-
         
         self.gold = 0
         self.maxHp = self.VIT * 2
@@ -27,49 +51,43 @@ class Character(object):
         self.posY = y
         #self.load(image)
 
-        self.inBattle = True
-        self.isTargeted = False
+        # self.inBattle = True
+        # self.isTargeted = False
     
         self.melee = []
         self.ranged = []
         
+        self.armor = 0
+        self.naturalArmor = naturalArmor
         self.items = [] 
+        self.steps = 0
+        self.pathToGo = []
+        # self.canAttack = True
+        self.feats = []
+        
+    def setNumSteps(self):
+        steps = 1 + self.AGI / 4
+        #~ if steps < 0: steps = 1        
+        self.steps = steps
     
-
     def draw(self, screen, coord):
         screen.blit(self.image, coord)
-        
-        if self.inBattle:
-            screen.blit(self.hpBarBack,  coord)
-            screen.blit(self.calcHpBar(),  (coord[0]+1, coord[1]+1))            
 
-        if self.isTargeted:
-            screen.blit(constants.targetCursor, coord)
-        
-        
-    def calcHpBar(self):
-        hpBarRatio = self.hp / float(self.maxHp)
-        hpBarSize = int(hpBarRatio * 30)
-        hpBar = pygame.Surface((hpBarSize, 2))
-        if hpBarRatio > 0.70:
-            hpBar.fill((0, 100, 0))
-        elif hpBarRatio > 0.30:
-            hpBar.fill((255, 255, 0))
-        else:
-            hpBar.fill((255, 0, 0))
-        return hpBar
-        
     def moveLeft(self):
         self.posX -= 1
-
+        self.steps -=1
+        
     def moveRight(self):
         self.posX += 1
+        self.steps -=1
 
     def moveUp(self):
         self.posY -= 1
+        self.steps -=1
 
     def moveDown(self):
         self.posY += 1
+        self.steps -=1
         
     def save(self):
         self.image = []
@@ -79,8 +97,7 @@ class Character(object):
         self.image = image
             
         self.hpBarBack = pygame.Surface((32, 4))
-        self.hpBarBack.fill((0,0,0))    
-        
+        self.hpBarBack.fill((0,0,0))            
         
     def printStats(self):
         print 'Name', self.name
@@ -107,43 +124,59 @@ class Character(object):
         self.hp -= dmg
         if self.hp < 0: self.hp = 0
         
-    def attack(self, defender, isMelee):
-
-        aSkill, aCrit = constants.rollDice(1,self.skill,self.modSkill,-1)
+    def canAttackPos(self, x, y):
+        #if self.ranged:
+        if self.melee:
+            if self.posX == x+1 and self.posY == y:
+                return True
+            elif self.posX == x-1 and self.posY == y:
+                return True
+            elif self.posX == x and self.posY == y+1:
+                return True
+            elif self.posX == x and self.posY == y-1:
+                return True
+                
+    def attack(self, defender):
+        aSkill, aCrit = constants.rollDice(1, self.skill, self.modSkill, -1)
         #Return on critical failure
-        if aCrit == -1: 
-            return  -1, -1
+        if aCrit == -1:
+            print 'Critical Failure'
+            return 0, -1
             
-        dSkill, dCrit = constants.rollDice(1,defender.skill,defender.modSkill,-1)
+        if aCrit > 0: print 'Crit'
+        
+        #dSkill, dCrit = constants.rollDice(1,defender.skill,defender.modSkill,-1)
+        dSkill = defender.naturalArmor + defender.armor + defender.getMod(defender.AGI)
+        
+        print 'skill', aSkill, dSkill
         
         if aSkill > dSkill:
-            if isMelee:
-                weapon = self.melee
-            else:
-                weapon = self.ranged
+            # if isMelee:
+            weapon = self.melee
+            # else:
+            #     weapon = self.ranged
             
             die, sides, mod, crits = weapon.damage
             
-            if   weapon.type == 'STR': 
+            if weapon.type == 'STR':
                 mod += self.modSTR
             elif weapon.type == 'AGI': 
                 mod += self.modAGI
             elif weapon.type == 'MAG': 
                 mod += self.modMAG
-            
-            dmg, dCrit = constants.rollDice(die,sides,mod,crits)
-            defender.takeDamage(dmg)
-            return dmg, dCrit
+
+            return constants.rollDice(die, sides, mod, crits)
             
         else:
-            return  -1, -1
-            
+            return 0, -1
+
+
 class Player(Character):
     def __init__(self, name, gender, race, image):
         self.map = 'battle'
-
+        
         race1 = constants.RACES[race]
-        super(Player, self).__init__(name, gender, race, image, 5, 6, 10, race1.STR, race1.AGI, race1.VIT, race1.MAG)
+        super(Player, self).__init__(name, gender, race, image, 5, 6, 20, race1.naturalArmor, race1.STR, race1.AGI, race1.VIT, race1.MAG)
         self.gold = 20
             
         self.melee = constants.BLADES['short sword']
@@ -157,10 +190,14 @@ class Player(Character):
         self.equipBody = 'leather_jacket.bmp'
         self.equipLegs = 'leg/pants_darkgreen.bmp'
         self.equipFeet = 'short_brown2.bmp'
-        
+
+        self.image = None
         self.load(image)
         self.printStats()
 
+        self.isPlayer = True
+        self.isMeleeMode = True
+        
     def draw(self, screen):
         Character.draw(self, screen, (7*constants.TILESIZE, 7*constants.TILESIZE))
 
@@ -174,7 +211,7 @@ class Player(Character):
         else:
             gender = 'f'
         
-        if self.equipCloak != []:   
+        if self.equipCloak:
             self.image = pygame.image.load('gfx/player/cloak/' + 'black.bmp')
             self.image.set_colorkey(constants.COLORKEY)
             
@@ -189,47 +226,48 @@ class Player(Character):
         temp.set_colorkey(constants.COLORKEY)
         self.image.blit(temp, (0,0))
 
-        if self.equipFeet != []:        
+        if self.equipFeet:
             temp = pygame.image.load('gfx/player/boot/'+ self.equipFeet)
             temp.set_colorkey(constants.COLORKEY)
             self.image.blit(temp, (0,0))
         
-        if self.equipLegs != []:
+        if self.equipLegs:
             temp = pygame.image.load('gfx/player/' + self.equipLegs)
             temp.set_colorkey(constants.COLORKEY)
             self.image.blit(temp, (0,0))
         
-        if self.equipBody != []:
+        if self.equipBody:
             temp = pygame.image.load('gfx/player/body/' + self.equipBody)
             temp.set_colorkey(constants.COLORKEY)
             self.image.blit(temp, (0,0))
         
-        if self.hair != []:
+        if self.hair:
             temp = pygame.image.load('gfx/player/hair/' + self.hair)
             temp.set_colorkey(constants.COLORKEY)
             self.image.blit(temp, (0,0))
         
-        if self.beard != []:
+        if self.beard:
             temp = pygame.image.load('gfx/player/beard/' + self.beard)
             temp.set_colorkey(constants.COLORKEY)
             self.image.blit(temp, (0,0))
         
-        if self.equipHead != []:
+        if self.equipHead:
             temp = pygame.image.load('gfx/player/head/' + self.equipHead)
             temp.set_colorkey(constants.COLORKEY)
             self.image.blit(temp, (0,0))
         
         if self.isMelee:
-            if self.melee != []:
+            if self.melee:
                 temp = pygame.image.load('gfx/player/' + self.melee.imgName)
                 temp.set_colorkey(constants.COLORKEY)
                 self.image.blit(temp, (0,0))
         else:
-            if self.ranged != []:
+            if self.ranged:
                 temp = pygame.image.load('gfx/player/' + self.ranged.imgName)
                 temp.set_colorkey(constants.COLORKEY)
                 self.image.blit(temp, (0,0))
-        
+
+
 class Monster(Character):
     def __init__(self, name, x, y):
     
@@ -249,26 +287,23 @@ class Monster(Character):
             stats = monStats[4]
             
         image.set_colorkey(constants.COLORKEY)
-        super(Monster, self).__init__(name, 1, 'Monster', image, x, y, skill, *stats)
+        super(Monster, self).__init__(name, 1, 'Monster', image, x, y, skill, 4, *stats)
         self.load(image)
         
         self.ranged = monStats[1]
         self.melee = monStats[2]
         self.printStats()
+        self.isPlayer = False
         
     def draw(self, screen, x, y):
         isValid, deltaX, deltaY = self.inView(x, y)
         if isValid:
             Character.draw(self, screen, ( (7 - deltaX)*constants.TILESIZE, (7 - deltaY)*constants.TILESIZE) )
             
-
-
-
     def load(self, image):
         Character.load(self, image)
         #self.createImage()
-        
-        
+
     def inView(self, x, y):
         isValid = False
         deltaX = (x - self.posX)

@@ -2,16 +2,20 @@ import pygame, sys
 from pygame.locals import *
 import constants
 
+
 class State(object):
     def __init__(self, screen, content):
         self.screen = screen
         self.content = content
-        self.dt  = 0
+        self.dt = 0
         self.keys = []
         self.cooltime = constants.COOLTIME
+        self.keysDown = []
+        self.events = []
 
     def update(self, clock):
         self.keysDown = []
+        self.events = []
         self.dt = clock.get_time()
     
         for event in pygame.event.get():
@@ -19,13 +23,18 @@ class State(object):
                 if event.type == KEYDOWN:
                     self.keysDown.append(event.key)
                     self.keys.append([event.key, constants.ICOOLTIME])
-                elif event.type == KEYUP: self.keyreleased(event.key)
+                elif event.type == KEYUP:
+                    self.keyreleased(event.key)
+
+            elif event.type == USEREVENT+1:
+                self.events.append(event)
 
     def draw(self):
-        for i in xrange(len(self.keys)):
-            if self.keys[i][0] == key:
-                self.keys.pop(i)
-                break
+        # for i in xrange(len(self.keys)):
+        #     if self.keys[i][0] == key:
+        #         self.keys.pop(i)
+        #         break
+        pass
     
     def keyreleased(self, key):
         for i in xrange(len(self.keys)):

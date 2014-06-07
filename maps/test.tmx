@@ -15,24 +15,75 @@
  <tileset firstgid="418" name="dg_extended" tilewidth="32" tileheight="32">
   <image source="../gfx/tiles/dg_extended.bmp" trans="476c6c" width="892" height="64"/>
  </tileset>
+ <tileset firstgid="472" name="obstacles" tilewidth="32" tileheight="32">
+  <image source="../gfx/redsquare.png" width="32" height="32"/>
+ </tileset>
  <layer name="Tile Layer 1" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJzt1LENwjAUhOFjLbYJooOGMoIFCCOwABuxDk5hJbEekl1xRv8nXZPqnZ5fJAAAADh57urjrJz1ru9x7lP2mNK3R5BJvruJ3s487z5I1OP9o7lLQ8phlaPaeri4aDvbWdt7eCm+D7cuY8o15aSlR+1/y6lHnivvpfceeS831fVwe1fZeqaeO7T26MU/dIi43jcAAAAAAACANh8UyFsw
+   eJzt1NEJgzAUheHbTTqHE/jUbtB9tCP40hG6Vp3CCPoSbqIG49X0D3wIAeEeThKRMtYLAACgIN1tHes5t2RoJOzMefwcrdt7K1oJdxPLbpVlnLdSxHLEslv1k5oj9M/RfWhnpBL9fvhZlrJbZEl5t2LZrc5Vjvc2dyfanHvlsHqffxucaW5f73ydx/R9et95v9+p95w56hVSchzdx13ks+QKOUroQ7vPdWDfelYAAAAAAIB/UMoaAGElmTc=
   </data>
  </layer>
- <layer name="Tile Layer 3" width="50" height="50" visible="0">
+ <layer name="Tile Layer 3" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJzt0sEJACAMA8B2ZOdSd9QNfCr1DvJPIBEAAMCPekbMnZG3m1BRK/IrO95iBwAAAAAAJwtMwgRC
+   eJzt1ksOgjAQgOGZm3oFWLkBruIevYO38DoawVAIVWNrO4X/S2YDJDCPtogAAADM3QLvb03KfPdWW0xy9L5Xkcsjzvr+OeYyjIX65fiGyjNXqb+l1rBo9ZnLyReNynX5zmrlmnXNmOfRybf9sWYhYs1HiT1Y41tHpXnlkeIf8597TO5+RFwfxXJrsMzDwnnr+nYfst6P2Hnk6lM3nG2HT9EZ70fprO/z2DZmBwAAANiXO8DePxw=
   </data>
  </layer>
- <layer name="roof" width="50" height="50" visible="0">
+ <layer name="roof2" width="50" height="50" visible="0">
   <data encoding="base64" compression="zlib">
-   eJztzrERgCAQAEHoQ40cI7T/HmyKzyUQkk92Zy6/UgAAgL+2aB90ZE4tOKO3fruyxya16B70ZE4BAAAAAACQpgPD+gZN
+   eJzt1TEKgDAQRNF4D7USK/WmejHvJKYUzIawEDLKfzBdFnaaTQgAAABAfX3MkMjYcimHKebs3pkzM4rdPT08M7UtMWsiW2ZGscfTXvjO013d0XoBSLFup9ItLWHdHNUbZKGHFusP+MOfcLVeAAAAAAAAAJ93A3QfMM4=
   </data>
  </layer>
- <layer name="roof2" width="50" height="50">
+ <layer name="obstacles" width="50" height="50" visible="0">
   <data encoding="base64" compression="zlib">
-   eJztzzEKgDAQRNHkHmoVrNT738FLZXvTKIQFeQ9+P1MKAADMt0TroC1z1ActuuuzPXvYS3/5cUTnoCtzFAAAAAAAAGk6ERUKkw==
+   eJzt1lkOgCAMRVHc/wZdjvHDRAltypCmlnsSflSExxRKAQAA+DqPuffZeObNPLZ3Nqn8idRfLYclu/c4PO3V7bb6IX2r1fEyOh+9dWZY/luvCcv+6MkRaZ+11lxvduRVn4vWEpm1fzvk8Lhjrmoj4nyM3Bsi5niT9rP2XPsX4mOe9uZxzgMS1g4AAACwlwtJ2EqZ
   </data>
  </layer>
+ <objectgroup name="events" width="50" height="50">
+  <object type="door" x="736" y="832" width="32" height="32">
+   <properties>
+    <property name="roof" value="roof1"/>
+   </properties>
+  </object>
+  <object type="door" x="736" y="544" width="32" height="32">
+   <properties>
+    <property name="roof" value="roof2"/>
+   </properties>
+  </object>
+  <object type="door" x="1152" y="576" width="32" height="32">
+   <properties>
+    <property name="roof" value="roof3"/>
+   </properties>
+  </object>
+  <object name="2" type="warp" x="0" y="1152" width="1600" height="32">
+   <properties>
+    <property name="destX" value=""/>
+    <property name="destY" value=""/>
+    <property name="map" value=""/>
+   </properties>
+  </object>
+  <object name="2" type="warp" x="0" y="256" width="32" height="896">
+   <properties>
+    <property name="destX" value=""/>
+    <property name="destY" value=""/>
+    <property name="map" value=""/>
+   </properties>
+  </object>
+  <object name="2" type="warp" x="0" y="224" width="1600" height="32">
+   <properties>
+    <property name="destX" value=""/>
+    <property name="destY" value=""/>
+    <property name="map" value=""/>
+   </properties>
+  </object>
+  <object name="2" type="warp" x="1568" y="256" width="32" height="896">
+   <properties>
+    <property name="destX" value=""/>
+    <property name="destY" value=""/>
+    <property name="map" value=""/>
+   </properties>
+  </object>
+  <object name="roof1" type="roof" x="576" y="672" width="352" height="160"/>
+  <object name="roof2" type="roof" x="640" y="416" width="224" height="128"/>
+  <object name="roof3" type="roof" x="1056" y="448" width="224" height="128"/>
+ </objectgroup>
 </map>

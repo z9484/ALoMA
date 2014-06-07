@@ -6,6 +6,7 @@ from states.gamestate import *
 #from states.combatstate import *
 import constants
 
+
 class Game(object):
     def __init__(self):
         self.screen = pygame.display.set_mode((640, 480))#, pygame.FULLSCREEN)
@@ -14,7 +15,7 @@ class Game(object):
 
         ## Load Content ## try static
         pygame.font.init()
-        font = pygame.font.Font(None, 20)
+        font = pygame.font.Font(r'gfx/ui/fonts/alagard_by_pix3m-d6awiwp.ttf', 20)
 
         self.tiles = {}
         self.tiles["monsters"] = [pygame.image.load('gfx/monsters/animals/black_snake.bmp'),
@@ -31,21 +32,27 @@ class Game(object):
         #self.tiles["moveTile"].fill((0,0,0))    
         #self.tiles["moveTile"].set_alpha(15)
         self.tiles["font1"] = font
-        
-  
+
         try:
             with open("player.dat", 'r') as file: 
                 storage = pickle.load(file)
-                player1 = storage
-                player1.load(chars)
+                party = storage
+                for player in party.members:
+                    player.load(chars)
         except:
             print "Creating new player"
-            player1 = Player("Joram", MALE, 'human', chars)
+            party = Party()
+            party.add(Player("Joram1", MALE, 'human', chars))
+            party.add(Player("Joram2", MALE, 'human', chars))
+            party.add(Player("Joram3", MALE, 'human', chars))
+            party.add(Player("Joram4", MALE, 'human', chars))
 
-        
+            party.members[1].isBackRow = True
+            party.members[3].isBackRow = True
+
         self.currentState = 0
         self.gamestate = []
-        self.gamestate.append(GameState(self.screen, self.tiles, player1, self.gamestate))
+        self.gamestate.append(GameState(self.screen, self.tiles, party, self.gamestate))
         #CombatState(self.screen, self.tiles, player1,self.gamestate )]
         
         #self.gamestate = GameState(self.screen, self.tiles, player1)
@@ -61,12 +68,14 @@ class Game(object):
         self.gamestate[-1].draw()
         pygame.display.flip()
 
-
     def run(self):
         while 1:
             self.update()
             self.draw()
 
+# pygame.mixer.init()
+# pygame.mixer.music.load('C:\programming\ALoMaA\music\FoxieEpic_0.OGG')
+# pygame.mixer.music.play()
 
 game = Game()
 game.run()

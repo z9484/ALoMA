@@ -1,4 +1,4 @@
-class Sprite(object):
+class MySprite(object):
     def __init__(self, images):
         self.images = images
         self.frame = 0
