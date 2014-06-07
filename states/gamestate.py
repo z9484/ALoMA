@@ -16,6 +16,7 @@ import pdb
  
 MOVE_MAX = 15
 
+# USEREVENT_ANIM_EVENT = pygame.USEREVENT+1
 
 class GameState(State):
     def __init__(self, screen, content, party, gamestate):

@@ -3,6 +3,7 @@ from Battler import Battler
 from constants import *
 #from player import *
 import pygame, sys
+from AnimEvents import *
 #from pygame.locals import *
 #import math
 #import random
@@ -24,43 +25,6 @@ class Message(object):
                 self.func(*self.args)
             else:
                 self.func()
-
-
-class AnimBaseEvent(object):
-    def __init__(self, image, coord):
-        self.coord = coord
-        self.count = 15
-        self.image = image
-        self.func = None
-        self.args = None
-
-    def update(self):
-        self.count -= 1
-        if self.count == 0:
-            self.call()
-
-    def draw(self, screen):
-        screen.blit(self.image, self.coord)
-
-    def loadFunc(self, func, *args):
-        self.func = func
-        self.args = args
-
-    def call(self):
-        if self.func is not None:
-            if self.args:
-                self.func(*self.args)
-            else:
-                self.func()
-
-class TextEvent(AnimBaseEvent):
-    def __init__(self, content, text, coord, color):
-        super(TextEvent, self).__init__(content["font1"].render(text, True, color), coord)
-
-
-class AnimEvent(AnimBaseEvent):
-    def __init__(self, content, spriteSheet, coord):
-        super(AnimEvent, self).__init__(spriteSheet, coord)
 
 
 class CombatState(State):
@@ -246,25 +210,30 @@ class CombatState(State):
             for char in self.lhsPlayers:
                 char.update()
                 if char.active:
-                    target = random.choice(self.rhsPlayers)
+                    choices = [player for player in self.rhsPlayers if player.character.hp > 0]
+                    target = random.choice(choices)
+                    print target.character.name
+
                     # target = self.rhsPlayers[0]
-                    dmg, dCrit = char.attack(target.character)
-                    dmgString = str(abs(dmg))
-                    if dmg == 0:
-                        print 'Missed'
-                        dmgString = 'Miss'
+                    dmg, dCrit = char.attack(target, self.content)
+                    char.events['attacking'].loadFunc(self.doDamage, dmg, target)
+                    # dmgString = str(abs(dmg))
+                    # if dmg == 0:
+                    #     print 'Missed'
+                    #     dmgString = 'Miss'
+                    #
+                    # char.didAction(1)
+                    # if dmg > 0:
+                    #     color = RED
+                    # elif dmg == 0:
+                    #     color = WHITE
+                    # else:
+                    #     color = GREEN
 
-                    char.didAction(1)
-                    if dmg > 0:
-                        color = RED
-                    elif dmg == 0:
-                        color = WHITE
-                    else:
-                        color = GREEN
+                    # event = TextEvent(self.content, dmgString, (target.rect.x, target.rect.y - 5), color)
 
-                    event = TextEvent(self.content, dmgString, (target.rect.x, target.rect.y - 5), color)
-                    event.loadFunc(self.doDamage, dmg, target)
-                    self.animEvents.append(event)
+
+                    # self.animEvents.append(event)
 
         for key in self.keysDown:
             self.keyHandler(key)
@@ -274,7 +243,9 @@ class CombatState(State):
                 self.keyHandler(self.keys[i][0])
 
         for event in self.events:
-            print event.category + '!!!!!!!!!!!'
+            # print event.category + '!!!!!!!!!!!'
+            if event.type == constants.USEREVENT_EVENT_TO_ADD:
+                self.animEvents.append(event.payload)
 
         for event in self.animEvents:
             event.update()
@@ -408,17 +379,9 @@ class CombatState(State):
         elif self.mode == 1:
             if self.currentAction == 'attack':
                 target = self.lhsPlayers[self.current]
-                dmg, dCrit = self.rhsPlayers[self.currentPlayer].attack(target.character)
-                dmgString = str(abs(dmg))
-                if dmg == -1:
-                    print 'Missed'
-                    dmgString = 'Miss'
-
-                event = TextEvent(self.content, dmgString, (target.rect.x, target.rect.y - 5), RED if dmg >= 0 else WHITE)
-                event.loadFunc(self.doDamage, dmg, target)
-                self.animEvents.append(event)
-
-                target.isTargeted = False
+                dmg, dCrit = self.rhsPlayers[self.currentPlayer].attack(target, self.content)
+                self.rhsPlayers[self.currentPlayer].events['attacking'].loadFunc(self.doDamage, dmg, target)
+                # self.animEvents.append(event)
                 self.currentPlayer = -1
                 self.currentAction = None
                 self.mode = 0

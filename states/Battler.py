@@ -1,6 +1,6 @@
 # import pygame
-# import random
 import constants
+from AnimEvents import *
 
 
 class Battler(object):
@@ -9,6 +9,8 @@ class Battler(object):
         self.isPlayer = isPlayer
         self.isMyTurn = False
         self.isTargeted = False
+        self.anim_state = ''
+        self.events = {}  # Current animation events currently affecting the battler
 
         if isPlayer:
             rate = constants.random.randrange(45, 95) * .01
@@ -20,7 +22,7 @@ class Battler(object):
         self.side = side
 
         self.isBackRow = character.isBackRow
-        self.rect = self.character.image.get_rect()
+        self.rect = self.character.images[0].get_rect()
 
         self.rect.x = 32
         if self.isBackRow:
@@ -44,9 +46,20 @@ class Battler(object):
 
         self.commands = [content["font1"].render(text, True, constants.WHITE) for text in self.commandText]
 
-    def attack(self, target):
-        dmg, dCrit = self.character.attack(target)
+    def attack(self, target, content):
+        dmg, dCrit = self.character.attack(target.character)
+        dmgString = str(abs(dmg))
+        if dmg == -1:
+            print 'Missed'
+            dmgString = 'Miss'
+
+        event = TextEvent(content, dmgString, (target.rect.x, target.rect.y - 5), constants.RED if dmg >= 0 else constants.WHITE)
+        self.events['attacking'] = event
+        target.isTargeted = False
+
         self.didAction(1)
+        self.anim_state = 'attacking'
+        self.character.animcount = self.character.ANIM_BATTLE_TIME
 
         return dmg, dCrit
 
@@ -60,16 +73,31 @@ class Battler(object):
         if self.character.hp <= 0:
             return
 
+        if self.anim_state:
+            self.character.animcount -= 1
+            if self.character.animcount % 4 == 0:
+                self.character.frame = 1
+            else:
+                self.character.frame = 0
+
+            if self.character.animcount == 0:
+                if self.anim_state in self.events:
+                    event = constants.pygame.event.Event(constants.USEREVENT_EVENT_TO_ADD, payload=self.events[self.anim_state])
+                    constants.pygame.event.post(event)
+                    del self.events[self.anim_state]
+
+                self.anim_state = ''
+                self.character.frame = 0
+
         if self.waitTime < self.__getMaxWait() - 1:
             self.waitTime += 1
         elif self.waitTime == self.__getMaxWait() - 1:
             self.waitTime += 1
             self.active = True
-            # event = pygame.event.Event(, char=self)
-            # pygame.event.post(event)
 
     def draw(self, screen, content):
-        screen.blit(self.character.image, (self.rect.x, self.rect.y))
+        # if self.anim_state == 'attacking':
+        screen.blit(self.character.images[self.character.frame], (self.rect.x, self.rect.y))
         self.__blitLabels(screen, content)
 
     def drawCommands(self, screen, content, cursorPos):
@@ -82,8 +110,6 @@ class Battler(object):
 
     def __blitLabels(self, screen, content):
         if self.isPlayer:
-            # xCoord = screen.get_rect().centerx - 160 + self.character.partyPosition * 120
-            # yCoord = 400
             xCoord = 460
             yCoord = 400 + self.character.partyPosition * 18
 

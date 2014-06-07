@@ -51,8 +51,8 @@ class State(object):
             cool = 25
             
         if self.keys[index][1] <= 0:
-	        self.keys[index][1] = cool
-	        return True
+            self.keys[index][1] = cool
+            return True
         else:
-	        self.keys[index][1] -= self.dt
-	        return False
+            self.keys[index][1] -= self.dt
+            return False

@@ -28,6 +28,9 @@ class Party(object):
 
 
 class Character(object):
+    ANIM_TIME = 15
+    ANIM_BATTLE_TIME = 12
+
     def __init__(self, name, gender, race, image, x, y, skill, naturalArmor, ste, agi, vit, mag):
         self.name = name
         self.gender = gender
@@ -49,6 +52,7 @@ class Character(object):
 
         self.posX = x
         self.posY = y
+        self.animcount = Character.ANIM_TIME
         #self.load(image)
 
         # self.inBattle = True
@@ -64,6 +68,8 @@ class Character(object):
         self.pathToGo = []
         # self.canAttack = True
         self.feats = []
+        self.frame = 0
+        self.images = []
         
     def setNumSteps(self):
         steps = 1 + self.AGI / 4
@@ -71,7 +77,7 @@ class Character(object):
         self.steps = steps
     
     def draw(self, screen, coord):
-        screen.blit(self.image, coord)
+        screen.blit(self.images[self.frame], coord)
 
     def moveLeft(self):
         self.posX -= 1
@@ -90,14 +96,14 @@ class Character(object):
         self.steps -=1
         
     def save(self):
-        self.image = []
-        self.hpBarBack  = []
+        self.images = []
+        self.hpBarBack = []
         
-    def load(self, image):
-        self.image = image
+    def load(self, images):
+        self.images = images
             
-        self.hpBarBack = pygame.Surface((32, 4))
-        self.hpBarBack.fill((0,0,0))            
+        # self.hpBarBack = pygame.Surface((32, 4))
+        # self.hpBarBack.fill(constants.BLACK)
         
     def printStats(self):
         print 'Name', self.name
@@ -191,8 +197,15 @@ class Player(Character):
         self.equipLegs = 'leg/pants_darkgreen.bmp'
         self.equipFeet = 'short_brown2.bmp'
 
-        self.image = None
         self.load(image)
+
+        blinkImage = self.images[0].copy()
+        blinkImage.lock()
+        pxArray = pygame.PixelArray(blinkImage)
+        pxArray.replace(constants.BLACK, constants.WHITE)
+        blinkImage.unlock()
+        self.images.append(blinkImage)
+
         self.printStats()
 
         self.isPlayer = True
@@ -202,7 +215,7 @@ class Player(Character):
         Character.draw(self, screen, (7*constants.TILESIZE, 7*constants.TILESIZE))
 
     def load(self, image):
-        Character.load(self, image)
+        # Character.load(self, image)
         self.createImage()
         
     def createImage(self):
@@ -212,70 +225,72 @@ class Player(Character):
             gender = 'f'
         
         if self.equipCloak:
-            self.image = pygame.image.load('gfx/player/cloak/' + 'black.bmp')
-            self.image.set_colorkey(constants.COLORKEY)
+            image = pygame.image.load('gfx/player/cloak/' + 'black.bmp')
+            image.set_colorkey(constants.COLORKEY)
             
             temp = pygame.image.load('gfx/player/base/shadow.bmp')
             temp.set_colorkey(constants.COLORKEY)
-            self.image.blit(temp, (0,0))
+            image.blit(temp, (0,0))
         else:
-            self.image = pygame.image.load('gfx/player/base/shadow.bmp')
-            self.image.set_colorkey(constants.COLORKEY)
+            image = pygame.image.load('gfx/player/base/shadow.bmp')
+            image.set_colorkey(constants.COLORKEY)
         
         temp = pygame.image.load('gfx/player/base/{0}_{1}.bmp'.format(self.race, gender))
         temp.set_colorkey(constants.COLORKEY)
-        self.image.blit(temp, (0,0))
+        image.blit(temp, (0,0))
 
         if self.equipFeet:
             temp = pygame.image.load('gfx/player/boot/'+ self.equipFeet)
             temp.set_colorkey(constants.COLORKEY)
-            self.image.blit(temp, (0,0))
+            image.blit(temp, (0,0))
         
         if self.equipLegs:
             temp = pygame.image.load('gfx/player/' + self.equipLegs)
             temp.set_colorkey(constants.COLORKEY)
-            self.image.blit(temp, (0,0))
+            image.blit(temp, (0,0))
         
         if self.equipBody:
             temp = pygame.image.load('gfx/player/body/' + self.equipBody)
             temp.set_colorkey(constants.COLORKEY)
-            self.image.blit(temp, (0,0))
+            image.blit(temp, (0,0))
         
         if self.hair:
             temp = pygame.image.load('gfx/player/hair/' + self.hair)
             temp.set_colorkey(constants.COLORKEY)
-            self.image.blit(temp, (0,0))
+            image.blit(temp, (0,0))
         
         if self.beard:
             temp = pygame.image.load('gfx/player/beard/' + self.beard)
             temp.set_colorkey(constants.COLORKEY)
-            self.image.blit(temp, (0,0))
+            image.blit(temp, (0,0))
         
         if self.equipHead:
             temp = pygame.image.load('gfx/player/head/' + self.equipHead)
             temp.set_colorkey(constants.COLORKEY)
-            self.image.blit(temp, (0,0))
+            image.blit(temp, (0,0))
         
         if self.isMelee:
             if self.melee:
                 temp = pygame.image.load('gfx/player/' + self.melee.imgName)
                 temp.set_colorkey(constants.COLORKEY)
-                self.image.blit(temp, (0,0))
+                image.blit(temp, (0,0))
         else:
             if self.ranged:
                 temp = pygame.image.load('gfx/player/' + self.ranged.imgName)
                 temp.set_colorkey(constants.COLORKEY)
-                self.image.blit(temp, (0,0))
+                image.blit(temp, (0,0))
+
+        self.images.append(image)
 
 
 class Monster(Character):
     def __init__(self, name, x, y):
-    
-        #print dir(constants.MONSTERS)
         if name in constants.MONSTERS:
             #MONSTERS['rat'] = ('gfx/monsters/animals/gray_rat.bmp', None, BLADES['claws'], 8, (1, 1, 4, 0))
             monStats = constants.MONSTERS[name]
             image = pygame.image.load(monStats[0])
+            # image.fill((250, 250, 250))
+
             skill = monStats[3]
             stats = monStats[4]
             
@@ -289,7 +304,15 @@ class Monster(Character):
         image.set_colorkey(constants.COLORKEY)
         super(Monster, self).__init__(name, 1, 'Monster', image, x, y, skill, 4, *stats)
         self.load(image)
-        
+
+
+        blinkImage = self.images[0].copy()
+        blinkImage.lock()
+        pxArray = pygame.PixelArray(blinkImage)
+        pxArray.replace(constants.BLACK, constants.WHITE)
+        blinkImage.unlock()
+        self.images.append(blinkImage)
+
         self.ranged = monStats[1]
         self.melee = monStats[2]
         self.printStats()
@@ -298,11 +321,11 @@ class Monster(Character):
     def draw(self, screen, x, y):
         isValid, deltaX, deltaY = self.inView(x, y)
         if isValid:
-            Character.draw(self, screen, ( (7 - deltaX)*constants.TILESIZE, (7 - deltaY)*constants.TILESIZE) )
+            Character.draw(self, screen, ((7 - deltaX)*constants.TILESIZE, (7 - deltaY)*constants.TILESIZE))
             
     def load(self, image):
-        Character.load(self, image)
-        #self.createImage()
+        self.images.append(image)
+        # Character.load(self, image)
 
     def inView(self, x, y):
         isValid = False

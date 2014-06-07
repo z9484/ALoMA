@@ -2,6 +2,8 @@ from Being import *
 import random
 import pygame
 
+USEREVENT_EVENT_TO_ADD = 25
+
 
 class item(object):
     def __init__(self, name, imgName, value, dmg):
